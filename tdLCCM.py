@@ -20,7 +20,7 @@ iterations  - number of terms to generate. Discards first 1000 terms to allow tr
 x_0, y_0    - intitial point
 mu, k       - parameters
 '''
-def generateTerms(iterations, x_0, y_0,mu=8, k=8):
+def generateTerms(iterations, x_0=0.1, y_0=0.2,mu=8, k=8):
     x, y = x_0, y_0
     gain = math.pow(10,k)
 
