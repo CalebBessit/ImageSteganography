@@ -41,17 +41,17 @@ def main():
         x_0, y_0, mu, k = 0.1, 0.2, 8, 8
         eta = (x_0/y_0) * (mu/k)
 
-        x_0 = x_0/(PMc+eta)
-        y_0 = y_0/(PMs+eta)
+        x_0Prime = x_0/(PMc+eta)
+        y_0Prime = y_0/(PMs+eta)
 
         #Ranges on mu and k: [8,15]
-        mu  = (int( mu + (SDc/eta) ) % 8)+8
-        k   = (int( k + (SDs/eta) )  % 8)+8
+        muPrime  = (int( mu + (SDc/eta) ) % 8)+8
+        kPrime   = (int( k + (SDs/eta) )  % 8)+8
 
         #Pre-embedding processes
         s   = sWidth * sHeight
         print("Generating chaotic sequence terms...")
-        Am,Bm  = tdLCCM.generateTerms(s,x_0,y_0,mu,k)
+        Am,Bm  = tdLCCM.generateTerms(s,x_0Prime,y_0Prime,muPrime,kPrime)
 
         print("Combining and sorting results...")
         Xm = np.append(Am,Bm)
@@ -69,13 +69,14 @@ def main():
             layer   = int(   (3*P[i]-1)/(width*height)   )+1
             row     = ((P[i]-1)%height)
 
-            col     = (  math.floor((P[i]-1)/height  )%width)
+            col     = (  math.floor((P[i]-1)/width  )%height)
 
             embedPosMatrix.append([layer, row, col])
         
         #Create bit-matrix of secret data
         print("Generating secret bit matrix...")
         secretArray = secretArray.reshape(1,sWidth*sHeight)[0]
+        
 
         bitMatrix   = []
         for i in secretArray:
@@ -84,6 +85,7 @@ def main():
             bitMatrix.append(string[:4])
             bitMatrix.append(string[4:])
 
+        
         #Embedding process
         print("Embedding data...")
         pixels = rgbImage.load()
@@ -100,6 +102,16 @@ def main():
 
         print("Saving steganogram...")
         rgbImage.save("Steganograms/Steg4.2.0{}.tiff".format(index))
+
+        print("Saving extraction data...")
+        initKeys    = "Initial keys <x_0, y_0, mu, k>: {},{},{},{}".format(x_0,y_0,mu,k)
+        statValues  = "Stat values <PMc,PMs,SDc, SDs>: {},{},{},{}".format(PMc,PMs,SDc,SDs)
+        length      = "Message length: {}".format(s)
+        
+        extDataFile = open("ExtractionData/4.2.0{}.txt".format(index),"w")
+        extDataFile.write(initKeys+"\n"+statValues+"\n"+length)
+        extDataFile.close()
+
         print("Done with {}.".format(index))
         print()
         '''END PROCESSING'''
